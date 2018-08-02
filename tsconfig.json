@@ -1,0 +1,21 @@
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "noImplicitAny": true,
+        "skipLibCheck": true,
+        "noImplicitThis": true,
+        "emitDecoratorMetadata": true,
+        "experimentalDecorators": true,
+        "noUnusedLocals": true,
+        "target": "es2017",
+        "sourceMap": true,
+        "allowJs": true,
+        "outDir": "./dist"
+    },
+
+    "include": [
+        "src/**/*"
+    ],
+
+    "exclude": ["node_modules"]
+}
