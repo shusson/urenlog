@@ -16,7 +16,7 @@ const today = now.getFullYear() + "-" + month + "-" + day;
 
 const args = require("yargs") // eslint-disable-line
     .example(
-        '$0 -d "2018-08-03" -h 8 -t "Device Prototyping" Making Sense of Quantum Neural Blockchain AI"'
+        '$0 -d "2018-08-03" -h 8 -t "Device Prototyping" "Making Sense of Quantum Neural Blockchain AI"'
     )
     .command("$0 [notes]", "Submit log", (yargs: any) => {
         yargs.positional("notes", {
@@ -34,6 +34,9 @@ const args = require("yargs") // eslint-disable-line
     .nargs("t", 1)
     .describe("t", "work type")
     .default("t", "Device prototyping")
+    .boolean("s")
+    .alias("s", "dry")
+    .describe("s", "Dry run")
     .alias("d", "date")
     .nargs("d", 1)
     .describe("d", "date of work (default is todays date)")
@@ -72,6 +75,18 @@ const args = require("yargs") // eslint-disable-line
         const notes = (await page.$x("//textarea[contains(@aria-label, 'Notes about work')]"))[0];
         await notes.type(args.notes);
         await delay(1000);
+
+        if (args.dry) {
+            await browser.close();
+            return;
+        }
+
+        const submit = (await page.$x("//span[contains(text(), 'Submit')]"))[0];
+        await submit.click();
+
+        await page.waitForXPath("//div[contains(text(), 'Lekker hoor!')]");
+
+        console.log("success");
 
         await browser.close();
     } catch (error) {
