@@ -39,8 +39,6 @@ const args = require("yargs") // eslint-disable-line
     .describe("d", "date of work (default is todays date)")
     .default("d", `${today}`).argv;
 
-console.log(args);
-
 (async () => {
     try {
         const browser = await puppeteer.launch({
@@ -79,10 +77,10 @@ console.log(args);
     } catch (error) {
         console.log(error);
     }
-
-    function delay(time: number) {
-        return new Promise(function(resolve) {
-            setTimeout(resolve, time);
-        });
-    }
 })();
+
+function delay(time: number) {
+    return new Promise(function(resolve) {
+        setTimeout(resolve, time);
+    });
+}
