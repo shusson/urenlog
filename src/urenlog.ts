@@ -37,6 +37,9 @@ const args = require("yargs") // eslint-disable-line
     .boolean("s")
     .alias("s", "dry")
     .describe("s", "Dry run")
+    .boolean("k")
+    .alias("k", "headmore")
+    .describe("k", "Run headless mode")
     .alias("d", "date")
     .nargs("d", 1)
     .describe("d", "date of work (default is todays date)")
@@ -45,7 +48,7 @@ const args = require("yargs") // eslint-disable-line
 (async () => {
     try {
         const browser = await puppeteer.launch({
-            headless: false,
+            headless: !args.headmore,
             userDataDir: DATA_PATH
         });
         const page = await browser.newPage();
