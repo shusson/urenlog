@@ -39,7 +39,7 @@ const args = require("yargs") // eslint-disable-line
     .describe("s", "Dry run")
     .boolean("k")
     .alias("k", "headmore")
-    .describe("k", "Run headless mode")
+    .describe("k", "Run with browser (not headless)")
     .alias("d", "date")
     .nargs("d", 1)
     .describe("d", "date of work (default is todays date)")
