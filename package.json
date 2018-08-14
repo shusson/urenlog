@@ -7,6 +7,8 @@
   "license": "MIT",
   "private": true,
   "scripts": {
+    "prestart": "yarn install",
+    "login": "yarn run start -s -k \"Passing the butter\"",
     "start": "ts-node --type-check --files --project ./tsconfig.json ./src/urenlog"
   },
   "dependencies": {

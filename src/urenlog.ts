@@ -51,6 +51,8 @@ const args = require("yargs") // eslint-disable-line
             headless: !args.headmore,
             userDataDir: DATA_PATH
         });
+
+        // TODO: Put urls in config, so every year it's easy to fill in the new form
         const page = await browser.newPage();
         await page.goto("https://goo.gl/forms/q5rOgWnFgQ7msXeG3");
 
@@ -84,6 +86,8 @@ const args = require("yargs") // eslint-disable-line
             return;
         }
 
+
+        // TODO: Also check for 'Verzenden' (dutch variant) -- ala search for different thing than the label
         const submit = (await page.$x("//span[contains(text(), 'Submit')]"))[0];
         await submit.click();
 
