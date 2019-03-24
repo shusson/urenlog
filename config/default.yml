@@ -1,0 +1,7 @@
+# Link to google form sheet
+FORM_URL: "https://goo.gl/NcNe8o"
+
+# Default notes for the form
+about:
+  hours: 8
+  note: "Worked on "
