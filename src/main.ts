@@ -1,12 +1,14 @@
-const fs = require("fs");
-import * as puppeteer from "puppeteer";
+import { existsSync, mkdirSync } from "fs";
+import { ConfigService } from "./config.service";
 
+const config = new ConfigService();
+
+const puppeteer = require("puppeteer");
 const HOME = require("os").homedir();
+const CHROME_CONFIG_PATH = `${HOME}/.config/urenlog`;
 
-const DATA_PATH = `${HOME}/.config/urenlog`;
-
-if (!fs.existsSync(DATA_PATH)) {
-    fs.mkdirSync(DATA_PATH);
+if (!existsSync(CHROME_CONFIG_PATH)) {
+    mkdirSync(CHROME_CONFIG_PATH);
 }
 
 const now = new Date();
@@ -14,26 +16,24 @@ const day = ("0" + now.getDate()).slice(-2);
 const month = ("0" + (now.getMonth() + 1)).slice(-2);
 const today = now.getFullYear() + "-" + month + "-" + day;
 
+
 const args = require("yargs") // eslint-disable-line
     .example(
-        '$0 -d "2018-08-03" -h 8 -t "Device Prototyping" "Making Sense of Quantum Neural Blockchain AI"'
+        '$0 -d "2019-03-12" -h 8 "Making Sense of Quantum Neural Blockchain AI"'
     )
     .command("$0 [notes]", "Submit log", (yargs: any) => {
         yargs.positional("notes", {
             describe: "Notes about work",
-            default: "Making Sense of Quantum Neural Blockchain AI"
+            default: config.NOTE
         });
     })
+
     .help("h")
     .alias("h", "help")
     .alias("u", "hours")
     .nargs("u", 1)
     .describe("u", "Hours worked")
-    .default("u", "8")
-    .alias("t", "workType")
-    .nargs("t", 1)
-    .describe("t", "work type")
-    .default("t", "Device prototyping")
+    .default("u", config.HOURS)
     .boolean("s")
     .alias("s", "dry")
     .describe("s", "Dry run")
@@ -45,55 +45,69 @@ const args = require("yargs") // eslint-disable-line
     .describe("d", "date of work (default is todays date)")
     .default("d", `${today}`).argv;
 
+
 (async () => {
     try {
         const browser = await puppeteer.launch({
-            headless: !args.headmore,
-            userDataDir: DATA_PATH
+            // TODO: Waiting for the form submission is a bit flaky
+            headless: false,
+            userDataDir: CHROME_CONFIG_PATH
         });
 
-        // TODO: Put urls in config, so every year it's easy to fill in the new form
         const page = await browser.newPage();
-        await page.goto("https://goo.gl/forms/q5rOgWnFgQ7msXeG3");
 
-        await page.waitForXPath("//div[contains(text(), 'CTcue hours registration')]");
+        await page.goto(config.FORM_URL);
+        await page.waitForXPath("//div[contains(text(), 'CTcue time tracking')]");
+
+        delay(200);
+
+        // ---
+        // Work date
 
         const date = (await page.$x("//input[@type='date']"))[0];
 
         await page.evaluate(() => {
             let input = document.querySelector("input[type='date']");
+
             if (!input) {
                 return;
             }
+
             input.setAttribute("type", "text");
             return;
         });
 
         await date.type(args.date);
 
-        const work = (await page.$x(`//span[contains(text(), '${args.workType}')]`))[0];
-        await work.click();
+        delay(200);
+
+        // ---
+        // Hours worked
 
         const hours = (await page.$x("//input[contains(@aria-label, 'Hours')]"))[0];
         await hours.type(args.hours.toString());
+        delay(200);
 
-        const notes = (await page.$x("//textarea[contains(@aria-label, 'Notes about work')]"))[0];
+        // ---
+        // Note about work
+
+        const notes = (await page.$x("//textarea[contains(@aria-label, 'What were you working on?')]"))[0];
         await notes.type(args.notes);
         await delay(1000);
 
-        if (args.dry) {
-            await browser.close();
-            return;
+
+        // ---
+        // Submit the form
+
+        if (!args.dry) {
+            const submit = (await page.$x("//span[contains(text(), 'Submit')]"))[0];
+
+            if (submit) {
+                await submit.click();
+            }
+
+            await page.waitForNavigation();
         }
-
-
-        // TODO: Also check for 'Verzenden' (dutch variant) -- ala search for different thing than the label
-        const submit = (await page.$x("//span[contains(text(), 'Submit')]"))[0];
-        await submit.click();
-
-        await page.waitForXPath("//div[contains(text(), 'Lekker hoor!')]");
-
-        console.log("success");
 
         await browser.close();
     } catch (error) {

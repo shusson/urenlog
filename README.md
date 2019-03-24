@@ -1,20 +1,18 @@
 Urenlog
 =======
 
-New year, new hours! Fill them out here: [https://goo.gl/forms/q5rOgWnFgQ7msXeG3](https://goo.gl/forms/q5rOgWnFgQ7msXeG3) or check all your hours here: [https://goo.gl/yZScWN](https://goo.gl/yZScWN). Or even better, use an automated tool to fill them in for you/
-
 Works by using puppeteer to drive the browser.
 
 
 ## Authentication
 
-The automated script cannot login automatically, so you have to run (every 30 days?):
+The automated script cannot login automatically, so you have to run it every 30 days?
 
 ```
 yarn run login
 ```
 
-This will open a browser and requests you to login to Google. Then Chrome will store the cookie in the directory `${HOME}/.config/urenlog`, so it can be re-used.
+> This will open a browser and requests you to login to Google. Then Chrome will store the cookie in the directory `${HOME}/.config/urenlog`, so it can be re-used.
 
 
 ## Filling in hours
